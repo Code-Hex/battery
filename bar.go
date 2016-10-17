@@ -28,7 +28,7 @@ type Bar struct {
 	totalVal    int64
 	charLen     int64
 	prefix      rune
-	suffix      rune
+	postfix     rune
 	isNotFinish bool
 }
 
