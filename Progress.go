@@ -1,4 +1,4 @@
-package main
+package Progress
 
 import (
 	"fmt"
@@ -37,22 +37,8 @@ type Bar struct {
 	prefix      rune
 	postfix     rune
 	isNotFinish bool
-	showPercent bool
-	showCounter bool
-}
-
-func main() {
-	max := 100
-	bar := New(max)
-	bar.SetWidth(3)
-	bar.Run()
-
-	for i := 1; i <= max; i++ {
-		bar.Increment()
-		time.Sleep(bar.RefreshRate / 4)
-	}
-
-	bar.Finish()
+	ShowPercent bool
+	ShowCounter bool
 }
 
 func digit(num int64) string {
@@ -70,8 +56,8 @@ func New(total int) *Bar {
 		prefix:      '|',
 		postfix:     '|',
 		isNotFinish: true,
-		showPercent: true,
-		showCounter: true,
+		ShowPercent: true,
+		ShowCounter: true,
 	}
 }
 
@@ -127,11 +113,11 @@ func (bar *Bar) Finish() {
 }
 
 func (bar *Bar) writer() {
-	if bar.showPercent {
+	if bar.ShowPercent {
 		bar.format = "%3d%%" + bar.format
 	}
 
-	if bar.showCounter {
+	if bar.ShowCounter {
 		digit := digit(bar.totalVal)
 		bar.format += " %" + digit + "d/%" + digit + "d"
 	}
@@ -176,7 +162,18 @@ func (bar *Bar) print(nowVal int64) {
 }
 
 func (bar *Bar) write(frac float64, nowVal int64) {
-	fmt.Fprintf(bar.Out, bar.format, int(frac*100), string(bar.Gauge), int(nowVal), int(bar.totalVal))
+	var args []interface{}
+	if bar.ShowPercent {
+		args = append(args, int(frac*100))
+	}
+
+	args = append(args, string(bar.Gauge))
+
+	if bar.ShowCounter {
+		args = append(args, int(nowVal))
+		args = append(args, int(bar.totalVal))
+	}
+	fmt.Fprintf(bar.Out, bar.format, args...)
 }
 
 func (bar *Bar) divmod(frac float64) (int, int) {
