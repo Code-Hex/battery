@@ -1,6 +1,7 @@
 package Progress
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -46,6 +47,9 @@ func digit(num int64) string {
 }
 
 func New(total int) *Bar {
+	if total <= 0 {
+		panic(errors.New("Please specify total size that is greater than zero"))
+	}
 	return &Bar{
 		Out:         os.Stdout,
 		RefreshRate: DefaultRefreshRate,
@@ -163,6 +167,7 @@ func (bar *Bar) print(nowVal int64) {
 
 func (bar *Bar) write(frac float64, nowVal int64) {
 	var args []interface{}
+
 	if bar.ShowPercent {
 		args = append(args, int(frac*100))
 	}
