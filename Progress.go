@@ -50,7 +50,7 @@ func New(total int) *Bar {
 	if total <= 0 {
 		panic(errors.New("Please specify total size that is greater than zero"))
 	}
-	return &Bar{
+	bar := &Bar{
 		Out:         os.Stdout,
 		RefreshRate: DefaultRefreshRate,
 		totalVal:    int64(total),
@@ -63,6 +63,7 @@ func New(total int) *Bar {
 		ShowPercent: true,
 		ShowCounter: true,
 	}
+	return bar.SetWidth(5)
 }
 
 func (bar *Bar) SetPrefix(char rune) *Bar {
@@ -113,7 +114,6 @@ func (bar *Bar) Run() {
 func (bar *Bar) Finish() {
 	bar.isNotFinish = false
 	bar.print(atomic.LoadInt64(&bar.totalVal))
-	fmt.Println()
 }
 
 func (bar *Bar) writer() {
@@ -131,7 +131,7 @@ func (bar *Bar) writer() {
 	var load, beforeLoad int64
 	for bar.isNotFinish {
 		load = atomic.LoadInt64(&bar.nowVal)
-		if load != beforeLoad {
+		if load != beforeLoad && load <= bar.totalVal {
 			bar.print(load)
 			beforeLoad = load
 		}
@@ -188,4 +188,42 @@ func (bar *Bar) divmod(frac float64) (int, int) {
 	}
 	pre := int64(frac * float64(bar.width) * float64(bar.charLen))
 	return int(pre/bar.charLen) + 1, int(pre % bar.charLen)
+}
+
+func (bar *Bar) Write(p []byte) (int, error) {
+	l := len(p)
+	bar.Add(l)
+	return l, nil
+}
+
+func (bar *Bar) Read(p []byte) (int, error) {
+	l := len(p)
+	bar.Add(l)
+	return l, nil
+}
+
+// It's proxy reader, implement io.Reader
+type Reader struct {
+	io.Reader
+	bar *Bar
+}
+
+func (r *Reader) Read(p []byte) (n int, err error) {
+	n, err = r.Reader.Read(p)
+	r.bar.Add(n)
+	return
+}
+
+// Close the reader when it implements io.Closer
+func (r *Reader) Close() (err error) {
+	if closer, ok := r.Reader.(io.Closer); ok {
+		return closer.Close()
+	}
+	return
+}
+
+// Create new proxy reader over bar
+// Takes io.Reader or io.ReadCloser
+func (bar *Bar) NewProxyReader(r io.Reader) *Reader {
+	return &Reader{r, bar}
 }

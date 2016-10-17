@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
 
 	"../../../Progress"
 	"github.com/pkg/errors"
@@ -12,7 +11,7 @@ import (
 
 const (
 	version = "0.0.1"
-	msg     = "prog v" + version + ", Update multiple local repositories with parallel\n"
+	msg     = "prog v" + version + ", Progress bar\n"
 )
 
 type Prog struct {
@@ -66,10 +65,8 @@ func (prog *Prog) Ress() error {
 
 	bar.Run()
 
-	for i := 1; i <= opts.Total; i++ {
-		bar.Increment()
-		time.Sleep(bar.RefreshRate)
-	}
+	r := bar.NewProxyReader(prog.Stdin)
+	io.Copy(os.Stdout, r)
 
 	bar.Finish()
 
