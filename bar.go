@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io"
+	"math"
 	"os"
+	"strconv"
 	"sync/atomic"
 	"time"
 )
@@ -36,6 +38,7 @@ type Bar struct {
 	postfix     rune
 	isNotFinish bool
 	showPercent bool
+	showCounter bool
 }
 
 func main() {
@@ -52,6 +55,10 @@ func main() {
 	bar.Finish()
 }
 
+func digit(num int64) string {
+	return strconv.Itoa(int(math.Log10(float64(num))) + 1)
+}
+
 func New(total int) *Bar {
 	return &Bar{
 		Out:         os.Stdout,
@@ -64,6 +71,7 @@ func New(total int) *Bar {
 		postfix:     '|',
 		isNotFinish: true,
 		showPercent: true,
+		showCounter: true,
 	}
 }
 
@@ -114,7 +122,7 @@ func (bar *Bar) Run() {
 // End print
 func (bar *Bar) Finish() {
 	bar.isNotFinish = false
-	bar.write(atomic.LoadInt64(&bar.totalVal))
+	bar.print(atomic.LoadInt64(&bar.totalVal))
 	fmt.Println()
 }
 
@@ -123,20 +131,25 @@ func (bar *Bar) writer() {
 		bar.format = "%3d%%" + bar.format
 	}
 
+	if bar.showCounter {
+		digit := digit(bar.totalVal)
+		bar.format += " %" + digit + "d/%" + digit + "d"
+	}
+
 	bar.format = "\r" + bar.format
 
-	var load, oldload int64
+	var load, beforeLoad int64
 	for bar.isNotFinish {
 		load = atomic.LoadInt64(&bar.nowVal)
-		if load != oldload {
-			bar.write(load)
-			oldload = load
+		if load != beforeLoad {
+			bar.print(load)
+			beforeLoad = load
 		}
 		time.Sleep(bar.RefreshRate)
 	}
 }
 
-func (bar *Bar) write(nowVal int64) {
+func (bar *Bar) print(nowVal int64) {
 	frac := float64(nowVal) / float64(bar.totalVal)
 	barLen, fracBarLen := bar.divmod(frac)
 
@@ -159,7 +172,11 @@ func (bar *Bar) write(nowVal int64) {
 	// append postfix
 	bar.Gauge[bar.GaugeWidth] = bar.postfix
 
-	fmt.Fprintf(bar.Out, bar.format, int(frac*100), string(bar.Gauge))
+	bar.write(frac, nowVal)
+}
+
+func (bar *Bar) write(frac float64, nowVal int64) {
+	fmt.Fprintf(bar.Out, bar.format, int(frac*100), string(bar.Gauge), int(nowVal), int(bar.totalVal))
 }
 
 func (bar *Bar) divmod(frac float64) (int, int) {
