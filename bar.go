@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"sync/atomic"
 	"time"
 )
@@ -18,18 +20,22 @@ var chars = []rune{
 	'█',
 }
 
-var DefaultRefreshRate = time.Millisecond * 200
+var DefaultRefreshRate = time.Millisecond * 100
 
 type Bar struct {
 	Gauge       []rune
+	GaugeWidth  int
 	RefreshRate time.Duration
-	width       int64
-	currentVal  int64
+	Out         io.Writer
+	width       int
+	nowVal      int64
 	totalVal    int64
 	charLen     int64
+	format      string
 	prefix      rune
 	postfix     rune
 	isNotFinish bool
+	showPercent bool
 }
 
 func main() {
@@ -39,7 +45,7 @@ func main() {
 	bar.Run()
 
 	for i := 1; i <= max; i++ {
-		bar.Set(i)
+		bar.Increment()
 		time.Sleep(bar.RefreshRate / 4)
 	}
 
@@ -48,27 +54,36 @@ func main() {
 
 func New(total int) *Bar {
 	return &Bar{
+		Out:         os.Stdout,
 		RefreshRate: DefaultRefreshRate,
 		totalVal:    int64(total),
-		currentVal:  int64(-1),
+		nowVal:      int64(-1),
 		charLen:     int64(len(chars)),
+		format:      "%s",
 		prefix:      '|',
 		postfix:     '|',
 		isNotFinish: true,
+		showPercent: true,
 	}
 }
 
-func (bar *Bar) SetPrefix(char rune) {
+func (bar *Bar) SetPrefix(char rune) *Bar {
 	bar.prefix = char
+	return bar
 }
 
-func (bar *Bar) SetPostfix(char rune) {
+func (bar *Bar) SetPostfix(char rune) *Bar {
 	bar.postfix = char
+	return bar
 }
 
-func (bar *Bar) SetWidth(width int) {
-	bar.width = int64(width)
-	bar.Gauge = make([]rune, width, width)
+func (bar *Bar) SetWidth(width int) *Bar {
+	bar.width = width
+	// +1 for postfix
+	bar.GaugeWidth = width + 1
+	// +1 for prefix
+	bar.Gauge = make([]rune, bar.GaugeWidth+1, bar.GaugeWidth+1)
+	return bar
 }
 
 func (bar *Bar) Set(set int) *Bar {
@@ -76,7 +91,7 @@ func (bar *Bar) Set(set int) *Bar {
 }
 
 func (bar *Bar) Set64(set int64) *Bar {
-	atomic.StoreInt64(&bar.currentVal, set)
+	atomic.StoreInt64(&bar.nowVal, set)
 	return bar
 }
 
@@ -89,7 +104,7 @@ func (bar *Bar) Add(add int) int {
 }
 
 func (bar *Bar) Add64(add int64) int64 {
-	return atomic.AddInt64(&bar.currentVal, add)
+	return atomic.AddInt64(&bar.nowVal, add)
 }
 
 func (bar *Bar) Run() {
@@ -99,28 +114,37 @@ func (bar *Bar) Run() {
 // End print
 func (bar *Bar) Finish() {
 	bar.isNotFinish = false
-	bar.print(atomic.LoadInt64(&bar.totalVal))
+	bar.write(atomic.LoadInt64(&bar.totalVal))
 	fmt.Println()
 }
 
 func (bar *Bar) writer() {
-	var c, oc int64
+	if bar.showPercent {
+		bar.format = "%3d%%" + bar.format
+	}
+
+	bar.format = "\r" + bar.format
+
+	var load, oldload int64
 	for bar.isNotFinish {
-		c = atomic.LoadInt64(&bar.currentVal)
-		if c != oc {
-			bar.print(c)
-			oc = c
+		load = atomic.LoadInt64(&bar.nowVal)
+		if load != oldload {
+			bar.write(load)
+			oldload = load
 		}
 		time.Sleep(bar.RefreshRate)
 	}
 }
 
-func (bar *Bar) print(currentVal int64) {
-	frac := float64(currentVal) / float64(bar.totalVal)
+func (bar *Bar) write(nowVal int64) {
+	frac := float64(nowVal) / float64(bar.totalVal)
 	barLen, fracBarLen := bar.divmod(frac)
 
+	// append prefix
+	bar.Gauge[0] = bar.prefix
+
 	// append full block
-	for i := 0; i < barLen; i++ {
+	for i := 1; i < barLen; i++ {
 		bar.Gauge[i] = chars[bar.charLen-1]
 	}
 
@@ -128,18 +152,21 @@ func (bar *Bar) print(currentVal int64) {
 	bar.Gauge[barLen] = chars[fracBarLen]
 
 	// padding with whitespace
-	for i := barLen + 1; i < int(bar.width); i++ {
+	for i := barLen + 1; i < bar.GaugeWidth; i++ {
 		bar.Gauge[i] = ' '
 	}
 
-	fmt.Printf("\r%3d%%%c%s%c", int(frac*100), bar.prefix, string(bar.Gauge), bar.postfix)
+	// append postfix
+	bar.Gauge[bar.GaugeWidth] = bar.postfix
+
+	fmt.Fprintf(bar.Out, bar.format, int(frac*100), string(bar.Gauge))
 }
 
 func (bar *Bar) divmod(frac float64) (int, int) {
 	// Over 100%
 	if frac >= 1.0 {
-		return int(bar.width) - 1, int(bar.charLen) - 1
+		return bar.width, int(bar.charLen) - 1
 	}
 	pre := int64(frac * float64(bar.width) * float64(bar.charLen))
-	return int(pre / bar.charLen), int(pre % bar.charLen)
+	return int(pre/bar.charLen) + 1, int(pre % bar.charLen)
 }
