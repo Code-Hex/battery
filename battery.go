@@ -3,10 +3,10 @@ package battery
 import (
 	"errors"
 	"fmt"
-	"io"
 	"math"
-	"os"
 	"strconv"
+
+	"github.com/fatih/color"
 )
 
 // LENGTH: 8
@@ -24,7 +24,6 @@ var chars = []rune{
 type Bar struct {
 	Gauge       []rune
 	GaugeWidth  int
-	Out         io.Writer
 	width       int
 	nowVal      int
 	totalVal    int
@@ -32,8 +31,11 @@ type Bar struct {
 	format      string
 	prefix      rune
 	postfix     rune
+	charge      string
 	ShowPercent bool
 	ShowCounter bool
+	Showthunder bool
+	EnableColor bool
 }
 
 func digit(num int) string {
@@ -45,15 +47,17 @@ func New(total int) *Bar {
 		panic(errors.New("Please specify total size that is greater than zero"))
 	}
 	bar := &Bar{
-		Out:         os.Stdout,
 		totalVal:    total,
 		nowVal:      -1,
 		charLen:     len(chars),
-		format:      "%s",
+		format:      "%s%s",
 		prefix:      '|',
 		postfix:     '|',
+		charge:      "⚡️",
 		ShowPercent: true,
 		ShowCounter: true,
+		Showthunder: false,
+		EnableColor: false,
 	}
 	return bar.SetWidth(3)
 }
@@ -96,7 +100,7 @@ func (bar *Bar) writer() {
 		bar.format += " %" + digit + "d/%" + digit + "d"
 	}
 
-	bar.format = "\r" + bar.format
+	bar.format = "\r" + bar.format + "\n"
 
 	if bar.nowVal <= bar.totalVal {
 		bar.print()
@@ -132,18 +136,36 @@ func (bar *Bar) print() {
 
 func (bar *Bar) write(frac float64) {
 	var args []interface{}
+	percent := int(frac * 100)
 
 	if bar.ShowPercent {
-		args = append(args, int(frac*100))
+		args = append(args, percent)
 	}
 
 	args = append(args, string(bar.Gauge))
+
+	if bar.Showthunder {
+		args = append(args, bar.charge)
+	} else {
+		args = append(args, "  ")
+	}
 
 	if bar.ShowCounter {
 		args = append(args, bar.nowVal)
 		args = append(args, bar.totalVal)
 	}
-	fmt.Fprintf(bar.Out, bar.format, args...)
+
+	if bar.EnableColor {
+		if percent >= 60 {
+			color.New(color.FgGreen).Printf(bar.format, args...)
+		} else if 20 <= percent && percent < 60 {
+			color.New(color.FgYellow).Printf(bar.format, args...)
+		} else {
+			color.New(color.FgRed).Printf(bar.format, args...)
+		}
+	} else {
+		fmt.Printf(bar.format, args...)
+	}
 }
 
 func (bar *Bar) divmod(frac float64) (int, int) {
