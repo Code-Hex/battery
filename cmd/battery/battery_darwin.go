@@ -38,6 +38,7 @@ int battery(char **status, char **error) {
 		powerStatus = CFStringGetCStringPtr((CFStringRef)powerSrcVal, kCFStringEncodingUTF8);
 		setStrValue(status, powerStatus);
 
+		CFRelease(powerStatus);
 		CFRelease(powerSrcVal);
 	} else {
 		setStrValue(error, "Could not get power resource infomation");
