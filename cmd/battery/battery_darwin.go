@@ -18,17 +18,17 @@ int battery(char **status, char **error) {
 
 	CFTypeRef powerInfo = IOPSCopyPowerSourcesInfo();
 	CFArrayRef powerSrcList = IOPSCopyPowerSourcesList(powerInfo);
-	CFDictionaryRef powerSrcInfo;
+	CFDictionaryRef powerSrcInfo = NULL;
 
 	if (!powerSrcList) {
-		CFRelease(powerInfo);
+		if (powerInfo) CFRelease(powerInfo);
 		setStrValue(error, "Failed to get value from IOPSCopyPowerSourcesList()");
 		return -1;
 	}
 
 	int percentage;
-	const void *powerSrcVal;
-	CFStringRef powerStatus;
+	const void *powerSrcVal = NULL;
+	CFStringRef powerStatus = NULL;
 	if (CFArrayGetCount(powerSrcList)) {
 		powerSrcInfo = IOPSGetPowerSourceDescription(powerInfo, CFArrayGetValueAtIndex(powerSrcList, 0));
 		powerSrcVal = CFDictionaryGetValue(powerSrcInfo, CFSTR(kIOPSCurrentCapacityKey));
