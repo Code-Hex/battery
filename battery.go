@@ -148,7 +148,7 @@ func (bar *Bar) write(frac float64) {
 	if bar.Showthunder {
 		args = append(args, bar.charge)
 	} else {
-		args = append(args, "　")
+		args = append(args, "  ")
 	}
 
 	if bar.ShowPercent {
