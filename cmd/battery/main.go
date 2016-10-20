@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"../../../battery"
+	"github.com/Code-Hex/battery"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/pkg/errors"
 )
