@@ -7,15 +7,16 @@ battery unicode art on your tmux sessions or the terminal.
 
 ## Status
 (2016-10-20)
-Now, this command can use mac user only.
-However, I hope to support windows and linux, bsd in future. 
-So, plz help me (´；ω；｀)
+Now, this command can use mac user only.  
+However, I hope to support windows and linux, bsd in future.   
+So, plz help me (´；ω；｀)  
 
 ## Installation
     go get -u github.com/Code-Hex/battery/cmd/battery
 
 ## Usage
-	For tmux user, please write `#(battery -t)` in your `.tmux.conf`
+	For tmux user, please write `#(battery -t)` in your `.tmux.conf`  
+	Please refer to [this](https://github.com/Code-Hex/dotfiles/blob/master/tmux/.tmux.conf#L75)
 
 ## Author
 [codehex](https://twitter.com/CodeHex)
