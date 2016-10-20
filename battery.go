@@ -149,9 +149,9 @@ func (bar *Bar) write(frac float64) {
 	args = append(args, string(bar.Gauge))
 
 	if bar.Showthunder {
-		args = append(args, bar.charge)
+		args, args[0] = append(args[:1], args[0:]...), bar.charge
 	} else {
-		args = append(args, "  ")
+		args, args[0] = append(args[:1], args[0:]...), "  "
 	}
 
 	if bar.ShowCounter {
@@ -199,4 +199,8 @@ func (bar *Bar) divmod(frac float64) (int, int) {
 	}
 	pre := int(frac * float64(bar.width) * float64(bar.charLen))
 	return pre/bar.charLen + 1, pre % bar.charLen
+}
+
+func unshift() {
+
 }
