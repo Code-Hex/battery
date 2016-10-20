@@ -14,6 +14,22 @@ void setStrValue(char **dest, const char *src) {
 	strncpy(*dest, src, len);
 }
 
+char *CFStringCopyUTF8String(CFStringRef aString) {
+  if (aString == NULL) {
+    return NULL;
+  }
+
+  CFIndex length = CFStringGetLength(aString);
+  CFIndex maxSize =
+  CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
+  char *buffer = (char *)malloc(maxSize);
+  if (CFStringGetCString(aString, buffer, maxSize,
+                         kCFStringEncodingUTF8)) {
+    return buffer;
+  }
+  return NULL;
+}
+
 int battery(char **status, char **error) {
 
 	CFTypeRef powerInfo = IOPSCopyPowerSourcesInfo();
@@ -28,7 +44,7 @@ int battery(char **status, char **error) {
 
 	int percentage;
 	const void *powerSrcVal = NULL;
-	CFStringRef powerStatus = NULL;
+	const char *powerStatus = NULL;
 	if (CFArrayGetCount(powerSrcList)) {
 		powerSrcInfo = IOPSGetPowerSourceDescription(powerInfo, CFArrayGetValueAtIndex(powerSrcList, 0));
 		powerSrcVal = CFDictionaryGetValue(powerSrcInfo, CFSTR(kIOPSCurrentCapacityKey));
@@ -37,8 +53,6 @@ int battery(char **status, char **error) {
 		powerSrcVal = CFDictionaryGetValue(powerSrcInfo, CFSTR(kIOPSPowerSourceStateKey));
 		powerStatus = CFStringGetCStringPtr((CFStringRef)powerSrcVal, kCFStringEncodingUTF8);
 		setStrValue(status, powerStatus);
-
-		if (powerStatus) CFRelease(powerStatus);
 	} else {
 		setStrValue(error, "Could not get power resource infomation");
 		return -1;
