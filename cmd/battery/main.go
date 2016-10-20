@@ -16,7 +16,7 @@ func main() {
 
 	bar := battery.New(100)
 	bar.ShowCounter = false
-	bar.EnableColor = true
+	bar.EnableColor = false
 	bar.Showthunder = state
 
 	bar.Set(percent).Run()

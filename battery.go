@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
 	"strconv"
 
 	"github.com/fatih/color"
@@ -47,6 +48,7 @@ func New(total int) *Bar {
 		panic(errors.New("Please specify total size that is greater than zero"))
 	}
 	bar := &Bar{
+
 		totalVal:    total,
 		nowVal:      -1,
 		charLen:     len(chars),
@@ -157,14 +159,14 @@ func (bar *Bar) write(frac float64) {
 
 	if bar.EnableColor {
 		if percent >= 60 {
-			color.New(color.FgGreen).Printf(bar.format, args...)
+			fmt.Fprintf(os.Stderr, color.GreenString(bar.format, args...))
 		} else if 20 <= percent && percent < 60 {
-			color.New(color.FgYellow).Printf(bar.format, args...)
+			fmt.Fprintf(os.Stderr, color.YellowString(bar.format, args...))
 		} else {
-			color.New(color.FgRed).Printf(bar.format, args...)
+			fmt.Fprintf(os.Stderr, color.RedString(bar.format, args...))
 		}
 	} else {
-		fmt.Printf(bar.format, args...)
+		fmt.Fprintf(os.Stderr, bar.format, args...)
 	}
 }
 
