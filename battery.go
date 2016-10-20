@@ -55,10 +55,10 @@ func New(total int) *Bar {
 		totalVal:    total,
 		nowVal:      -1,
 		charLen:     len(chars),
-		format:      "%s%s",
+		format:      "%s",
 		prefix:      '|',
 		postfix:     '|',
-		charge:      "⚡️",
+		charge:      "⚡︎",
 		ShowPercent: true,
 		ShowCounter: true,
 		Showthunder: false,
@@ -106,6 +106,9 @@ func (bar *Bar) writer() {
 		bar.format += " %" + digit + "d/%" + digit + "d"
 	}
 
+	// for thunder
+	bar.format = "%s" + bar.format
+
 	if bar.nowVal <= bar.totalVal {
 		bar.print()
 	}
@@ -142,17 +145,19 @@ func (bar *Bar) write(frac float64) {
 	var args []interface{}
 	percent := int(frac * 100)
 
+	if bar.Showthunder {
+		args = append(args, bar.charge)
+	} else {
+		swap := make([]interface{}, len(args)+1)
+		swap = append(swap, "  ")
+		args = append(swap, args...)
+	}
+
 	if bar.ShowPercent {
 		args = append(args, percent)
 	}
 
 	args = append(args, string(bar.Gauge))
-
-	if bar.Showthunder {
-		args, args[0] = append(args[:1], args[0:]...), bar.charge
-	} else {
-		args, args[0] = append(args[:1], args[0:]...), "  "
-	}
 
 	if bar.ShowCounter {
 		args = append(args, bar.nowVal)
