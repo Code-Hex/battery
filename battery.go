@@ -37,6 +37,7 @@ type Bar struct {
 	ShowCounter bool
 	Showthunder bool
 	EnableColor bool
+	EnableTmux  bool
 }
 
 func digit(num int) string {
@@ -60,6 +61,7 @@ func New(total int) *Bar {
 		ShowCounter: true,
 		Showthunder: false,
 		EnableColor: false,
+		EnableTmux:  true,
 	}
 	return bar.SetWidth(3)
 }
@@ -158,15 +160,34 @@ func (bar *Bar) write(frac float64) {
 	}
 
 	if bar.EnableColor {
-		if percent >= 60 {
-			fmt.Fprintf(os.Stderr, color.GreenString(bar.format, args...))
-		} else if 20 <= percent && percent < 60 {
-			fmt.Fprintf(os.Stderr, color.YellowString(bar.format, args...))
+		if bar.EnableTmux {
+			colorTmuxPrint(percent, args...)
 		} else {
-			fmt.Fprintf(os.Stderr, color.RedString(bar.format, args...))
+			colorPrint(percent, args...)
 		}
 	} else {
 		fmt.Fprintf(os.Stderr, bar.format, args...)
+	}
+}
+
+func (bar *Bar) colorTmuxPrint(percent int, args ...interface{}) {
+	if percent >= 60 {
+		bar.format = "#[fg=1;32]" + bar.format + "#[default]"
+	} else if 20 <= percent && percent < 60 {
+		bar.format = "#[fg=1;33]" + bar.format + "#[default]"
+	} else {
+		bar.format = "#[fg=0;31]" + bar.format + "#[default]"
+	}
+	fmt.Fprintf(os.Stderr, bar.format, args...)
+}
+
+func (bar *Bar) colorPrint(percent int, args ...interface{}) {
+	if percent >= 60 {
+		fmt.Fprintf(os.Stderr, color.GreenString(bar.format, args...))
+	} else if 20 <= percent && percent < 60 {
+		fmt.Fprintf(os.Stderr, color.YellowString(bar.format, args...))
+	} else {
+		fmt.Fprintf(os.Stderr, color.RedString(bar.format, args...))
 	}
 }
 
