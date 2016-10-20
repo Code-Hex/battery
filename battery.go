@@ -1,6 +1,7 @@
 package battery
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"math"
@@ -23,6 +24,7 @@ var chars = []rune{
 }
 
 type Bar struct {
+	buffer      bytes.Buffer
 	Gauge       []rune
 	GaugeWidth  int
 	width       int
@@ -49,7 +51,7 @@ func New(total int) *Bar {
 		panic(errors.New("Please specify total size that is greater than zero"))
 	}
 	bar := &Bar{
-
+		buffer:      bytes.Buffer{},
 		totalVal:    total,
 		nowVal:      -1,
 		charLen:     len(chars),
@@ -103,8 +105,6 @@ func (bar *Bar) writer() {
 		digit := digit(bar.totalVal)
 		bar.format += " %" + digit + "d/%" + digit + "d"
 	}
-
-	bar.format = "\r" + bar.format + "\n"
 
 	if bar.nowVal <= bar.totalVal {
 		bar.print()
@@ -166,28 +166,29 @@ func (bar *Bar) write(frac float64) {
 			bar.colorPrint(percent, args...)
 		}
 	} else {
-		fmt.Fprintf(os.Stderr, bar.format, args...)
+		fmt.Fprintf(&bar.buffer, bar.format, args...)
 	}
+	os.Stdout.Write(bar.buffer.Bytes())
 }
 
 func (bar *Bar) colorTmuxPrint(percent int, args ...interface{}) {
 	if percent >= 60 {
-		bar.format = "#[fg=1;32]" + bar.format + "#[default]"
+		bar.format = "#[fg=green]" + bar.format
 	} else if 20 <= percent && percent < 60 {
-		bar.format = "#[fg=1;33]" + bar.format + "#[default]"
+		bar.format = "#[fg=yellow]" + bar.format
 	} else {
-		bar.format = "#[fg=0;31]" + bar.format + "#[default]"
+		bar.format = "#[fg=red]" + bar.format
 	}
-	fmt.Fprintf(os.Stderr, bar.format, args...)
+	fmt.Fprintf(&bar.buffer, bar.format+"#[default]", args...)
 }
 
 func (bar *Bar) colorPrint(percent int, args ...interface{}) {
 	if percent >= 60 {
-		fmt.Fprintf(os.Stderr, color.GreenString(bar.format, args...))
+		fmt.Fprintf(&bar.buffer, color.GreenString(bar.format), args...)
 	} else if 20 <= percent && percent < 60 {
-		fmt.Fprintf(os.Stderr, color.YellowString(bar.format, args...))
+		fmt.Fprintf(&bar.buffer, color.YellowString(bar.format), args...)
 	} else {
-		fmt.Fprintf(os.Stderr, color.RedString(bar.format, args...))
+		fmt.Fprintf(&bar.buffer, color.RedString(bar.format), args...)
 	}
 }
 

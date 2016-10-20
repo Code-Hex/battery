@@ -33,18 +33,13 @@ func main() {
 	bar := battery.New(100)
 	bar.EnableTmux = opts.Tmux
 	bar.ShowCounter = false
-	bar.EnableColor = false
+	bar.EnableColor = true
 	bar.Showthunder = state
 
 	bar.Set(percent).Run()
 }
 
 func parseOptions(opts *Options, argv []string) {
-
-	if len(argv) == 0 {
-		os.Stdout.Write(opts.usage())
-		os.Exit(0)
-	}
 
 	_, err := opts.parse(argv)
 	if err != nil {
