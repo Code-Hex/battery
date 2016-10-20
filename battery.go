@@ -161,9 +161,9 @@ func (bar *Bar) write(frac float64) {
 
 	if bar.EnableColor {
 		if bar.EnableTmux {
-			colorTmuxPrint(percent, args...)
+			bar.colorTmuxPrint(percent, args...)
 		} else {
-			colorPrint(percent, args...)
+			bar.colorPrint(percent, args...)
 		}
 	} else {
 		fmt.Fprintf(os.Stderr, bar.format, args...)
