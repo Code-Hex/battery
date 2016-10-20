@@ -1,6 +1,6 @@
 battery - Draw battery unicode art written by Go
 =======
-
+![sc_battery](https://cloud.githubusercontent.com/assets/6500104/19550024/6018c768-96e2-11e6-9ae1-f66b2406b8a7.png)  
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
   
 battery unicode art on your tmux sessions or the terminal.  
