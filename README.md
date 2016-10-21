@@ -21,7 +21,7 @@ So, plz help me (´；ω；｀)
 For tmux user, please write `#(battery -t)` in your `.tmux.conf`  
 Please refer to [this](https://github.com/Code-Hex/dotfiles/blob/master/tmux/.tmux.conf#L75)
 
-## Contributer 🎊
+## Contributor 🎊
 [mattn](https://github.com/mattn)
 
 ## Author
