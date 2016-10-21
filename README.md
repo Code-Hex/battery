@@ -9,7 +9,7 @@ battery unicode art on your tmux sessions or the terminal.
 (2016-10-21)  
 windows supported.  
   
-(2016-10-20)
+(2016-10-20)  
 Now, this command can use mac user only.  
 However, I hope to support ~~windows~~ and linux, bsd in future.   
 So, plz help me (´；ω；｀)  
