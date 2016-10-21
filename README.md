@@ -6,9 +6,12 @@ battery - Draw battery unicode art written by Go
 battery unicode art on your tmux sessions or the terminal.  
 
 ## Status
+(2016-10-21)  
+windows supported.  
+  
 (2016-10-20)
 Now, this command can use mac user only.  
-However, I hope to support windows and linux, bsd in future.   
+However, I hope to support ~~windows~~ and linux, bsd in future.   
 So, plz help me (´；ω；｀)  
 
 ## Installation
@@ -17,6 +20,9 @@ So, plz help me (´；ω；｀)
 ## Usage
 For tmux user, please write `#(battery -t)` in your `.tmux.conf`  
 Please refer to [this](https://github.com/Code-Hex/dotfiles/blob/master/tmux/.tmux.conf#L75)
+
+## Contributer 🎊
+[mattn](https://github.com/mattn)
 
 ## Author
 [codehex](https://twitter.com/CodeHex)
