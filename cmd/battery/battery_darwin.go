@@ -14,22 +14,6 @@ void setStrValue(char **dest, const char *src) {
 	strncpy(*dest, src, len);
 }
 
-char *CFStringCopyUTF8String(CFStringRef aString) {
-  if (aString == NULL) {
-    return NULL;
-  }
-
-  CFIndex length = CFStringGetLength(aString);
-  CFIndex maxSize =
-  CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
-  char *buffer = (char *)malloc(maxSize);
-  if (CFStringGetCString(aString, buffer, maxSize,
-                         kCFStringEncodingUTF8)) {
-    return buffer;
-  }
-  return NULL;
-}
-
 int battery(char **status, char **error) {
 
 	CFTypeRef powerInfo = IOPSCopyPowerSourcesInfo();
@@ -81,10 +65,5 @@ func BatteryInfo() (int, bool, error) {
 		return percent, false, errors.New(C.GoString(err))
 	}
 
-	isCharged := map[string]bool{
-		"AC Power":      true,
-		"Battery Power": false,
-	}
-
-	return percent, isCharged[C.GoString(status)], nil
+	return percent, "AC Power" == C.GoString(status), nil
 }
