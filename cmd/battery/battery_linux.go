@@ -27,8 +27,8 @@ func BatteryInfo() (int, bool, error) {
 			full, _ = strconv.ParseFloat(tokens[1], 64)
 		case "POWER_SUPPLY_ENERGY_NOW":
 			now, _ = strconv.ParseFloat(tokens[1], 64)
-		case "POWER_SUPPLY_PRESENT":
-			present = tokens[1] == "1"
+		case "POWER_SUPPLY_STATUS":
+			present = tokens[1] == "Full"
 		}
 	}
 	return int(now/full) * 100, present, nil
