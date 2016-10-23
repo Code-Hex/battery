@@ -12,6 +12,7 @@ func BatteryInfo() (int, bool, error) {
 	if err != nil {
 		return 0, false, err
 	}
+	defer f.Close()
 	scanner := bufio.NewScanner(f)
 
 	var full, now float64
