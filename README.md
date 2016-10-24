@@ -6,7 +6,7 @@ battery - Draw battery unicode art written by Go
 battery unicode art on your tmux sessions or the terminal.  
 
 ## Status
-(2016-10-24)
+(2016-10-24)  
 linux supported.  
 Thanks [mattn](https://github.com/mattn)!!  
 
