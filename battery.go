@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"os"
 	"strconv"
 
 	"github.com/fatih/color"
@@ -171,7 +170,7 @@ func (bar *Bar) write(frac float64) {
 	} else {
 		fmt.Fprintf(&bar.buffer, bar.format, args...)
 	}
-	os.Stdout.Write(bar.buffer.Bytes())
+	color.Output.Write(bar.buffer.Bytes())
 }
 
 func (bar *Bar) colorTmuxPrint(percent int, args ...interface{}) {
@@ -187,11 +186,11 @@ func (bar *Bar) colorTmuxPrint(percent int, args ...interface{}) {
 
 func (bar *Bar) colorPrint(percent int, args ...interface{}) {
 	if percent >= 60 {
-		fmt.Fprintf(&bar.buffer, color.GreenString(bar.format), args...)
+		bar.buffer.WriteString(color.GreenString(bar.format, args...))
 	} else if 20 <= percent && percent < 60 {
-		fmt.Fprintf(&bar.buffer, color.YellowString(bar.format), args...)
+		bar.buffer.WriteString(color.YellowString(bar.format, args...))
 	} else {
-		fmt.Fprintf(&bar.buffer, color.RedString(bar.format), args...)
+		bar.buffer.WriteString(color.RedString(bar.format, args...))
 	}
 }
 
