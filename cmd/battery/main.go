@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	version = "0.0.1"
+	version = "0.1.0"
 	msg     = "battery v" + version + "\n"
 )
 
@@ -19,6 +19,7 @@ const (
 type Options struct {
 	Help bool `short:"h" long:"help"`
 	Tmux bool `short:"t" long:"tmux"`
+	Has  bool `long:"has"`
 }
 
 func main() {
@@ -39,10 +40,16 @@ func main() {
 	bar.Set(percent).Run()
 }
 
+func HasBattery() int {
+	if _, _, err := BatteryInfo(); err != nil {
+		return 1
+	}
+	return 0
+}
+
 func parseOptions(opts *Options, argv []string) {
 
-	_, err := opts.parse(argv)
-	if err != nil {
+	if _, err := opts.parse(argv); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
@@ -50,6 +57,11 @@ func parseOptions(opts *Options, argv []string) {
 	if opts.Help {
 		os.Stdout.Write(opts.usage())
 		os.Exit(0)
+	}
+
+	if opts.Has {
+		// If your device have the battery, exit code is 0
+		os.Exit(HasBattery())
 	}
 }
 
@@ -73,7 +85,8 @@ func (opts Options) usage() []byte {
   Options:
   -h,  --help        print usage and exit
   -v,  --version     display the version of pget and exit
-  -t,  --tmux        display battery ascii art on tmux           
+  -t,  --tmux        display battery ascii art on tmux
+       --has         check to see if your device have the battery        
 `)
 	return buf.Bytes()
 }
