@@ -31,5 +31,5 @@ func BatteryInfo() (int, bool, error) {
 			present = tokens[1] == "Full"
 		}
 	}
-	return int(now/full) * 100, present, nil
+	return int(now / full * 100), present, nil
 }
