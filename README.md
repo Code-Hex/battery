@@ -26,7 +26,8 @@ For tmux user, please write `#(battery -t)` in your `.tmux.conf`
 Please refer to [this](https://github.com/Code-Hex/dotfiles/blob/master/tmux/.tmux.conf#L82)
 
 ## Contributor 🎊
-[mattn](https://github.com/mattn)
+[mattn](https://github.com/mattn)  
+[yasu47b](https://github.com/yasu47b)
 
 ## Author
 [codehex](https://twitter.com/CodeHex)
