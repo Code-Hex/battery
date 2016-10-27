@@ -17,9 +17,10 @@ const (
 
 // Options struct for parse command line arguments
 type Options struct {
-	Help bool `short:"h" long:"help"`
-	Tmux bool `short:"t" long:"tmux"`
-	Has  bool `long:"has"`
+	Help    bool `short:"h" long:"help"`
+	Tmux    bool `short:"t" long:"tmux"`
+	Has     bool `long:"has"`
+	Version bool `short:"v" long:"version"`
 }
 
 func main() {
@@ -59,6 +60,11 @@ func parseOptions(opts *Options, argv []string) {
 		os.Exit(0)
 	}
 
+	if opts.Version {
+		fmt.Fprintf(os.Stdout, msg)
+		os.Exit(0)
+	}
+
 	if opts.Has {
 		// If your device have the battery, exit code is 0
 		os.Exit(HasBattery())
@@ -84,9 +90,9 @@ func (opts Options) usage() []byte {
 		`Usage: battery [options]
   Options:
   -h,  --help        print usage and exit
-  -v,  --version     display the version of pget and exit
+  -v,  --version     display the version of battery and exit
   -t,  --tmux        display battery ascii art on tmux
-       --has         check to see if your device have the battery        
+       --has         check to see if your device have the battery
 `)
 	return buf.Bytes()
 }
