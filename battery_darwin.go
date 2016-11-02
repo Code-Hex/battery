@@ -1,4 +1,4 @@
-package main
+package battery
 
 /*
 #cgo CFLAGS: -x objective-c
@@ -54,7 +54,7 @@ import (
 	"unsafe"
 )
 
-func BatteryInfo() (int, bool, error) {
+func Info() (int, bool, error) {
 	var status *C.char
 	var err *C.char
 	defer C.free(unsafe.Pointer(status))

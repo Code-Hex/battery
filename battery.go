@@ -24,8 +24,8 @@ var chars = []rune{
 
 type Bar struct {
 	buffer      bytes.Buffer
-	Gauge       []rune
-	GaugeWidth  int
+	gauge       []rune
+	gaugeWidth  int
 	width       int
 	nowVal      int
 	totalVal    int
@@ -80,9 +80,9 @@ func (bar *Bar) SetPostfix(char rune) *Bar {
 func (bar *Bar) SetWidth(width int) *Bar {
 	bar.width = width
 	// +1 for postfix
-	bar.GaugeWidth = width + 1
+	bar.gaugeWidth = width + 1
 	// +1 for prefix
-	bar.Gauge = make([]rune, bar.GaugeWidth+1, bar.GaugeWidth+1)
+	bar.gauge = make([]rune, bar.gaugeWidth+1, bar.gaugeWidth+1)
 	return bar
 }
 
@@ -119,23 +119,23 @@ func (bar *Bar) print() {
 	barLen, fracBarLen := bar.divmod(frac)
 
 	// append prefix
-	bar.Gauge[0] = bar.prefix
+	bar.gauge[0] = bar.prefix
 
 	// append full block
 	for i := 1; i < barLen; i++ {
-		bar.Gauge[i] = chars[bar.charLen-1]
+		bar.gauge[i] = chars[bar.charLen-1]
 	}
 
 	// append lower block
-	bar.Gauge[barLen] = chars[fracBarLen]
+	bar.gauge[barLen] = chars[fracBarLen]
 
 	// padding with whitespace
-	for i := barLen + 1; i < bar.GaugeWidth; i++ {
-		bar.Gauge[i] = ' '
+	for i := barLen + 1; i < bar.gaugeWidth; i++ {
+		bar.gauge[i] = ' '
 	}
 
 	// append postfix
-	bar.Gauge[bar.GaugeWidth] = bar.postfix
+	bar.gauge[bar.gaugeWidth] = bar.postfix
 
 	bar.write(frac)
 }
@@ -154,7 +154,7 @@ func (bar *Bar) write(frac float64) {
 		args = append(args, percent)
 	}
 
-	args = append(args, string(bar.Gauge))
+	args = append(args, string(bar.gauge))
 
 	if bar.ShowCounter {
 		args = append(args, bar.nowVal)
@@ -201,8 +201,4 @@ func (bar *Bar) divmod(frac float64) (int, int) {
 	}
 	pre := int(frac * float64(bar.width) * float64(bar.charLen))
 	return pre/bar.charLen + 1, pre % bar.charLen
-}
-
-func unshift() {
-
 }

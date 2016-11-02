@@ -1,4 +1,4 @@
-package main
+package battery
 
 import (
 	"syscall"
@@ -19,7 +19,7 @@ type SYSTEM_POWER_STATUS struct {
 	BatteryFullLifeTime uint32
 }
 
-func BatteryInfo() (int, bool, error) {
+func Info() (int, bool, error) {
 	var sps SYSTEM_POWER_STATUS
 	_, r1, err := procGetSystemPowerStatus.Call(uintptr(unsafe.Pointer(&sps)))
 	if r1 != 0 {

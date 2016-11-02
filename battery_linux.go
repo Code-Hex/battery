@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func BatteryInfo() (int, bool, error) {
+func Info() (int, bool, error) {
 	f, err := os.Open("/sys/class/power_supply/BAT0/uevent")
 	if err != nil {
 		return 0, false, err

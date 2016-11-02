@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	version = "0.1.0"
+	version = "0.2.0"
 	msg     = "battery v" + version + "\n"
 )
 
@@ -26,7 +26,7 @@ type Options struct {
 func main() {
 	var opts Options
 	parseOptions(&opts, os.Args[1:])
-	percent, state, err := BatteryInfo()
+	percent, state, err := battery.Info()
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -41,8 +41,8 @@ func main() {
 	bar.Set(percent).Run()
 }
 
-func HasBattery() int {
-	if _, _, err := BatteryInfo(); err != nil {
+func hasBattery() int {
+	if _, _, err := battery.Info(); err != nil {
 		return 1
 	}
 	return 0
@@ -67,7 +67,7 @@ func parseOptions(opts *Options, argv []string) {
 
 	if opts.Has {
 		// If your device have the battery, exit code is 0
-		os.Exit(HasBattery())
+		os.Exit(hasBattery())
 	}
 }
 
