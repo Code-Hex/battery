@@ -11,28 +11,28 @@ import (
 )
 
 // LENGTH: 8
-var chars = []rune{
-	'▏',
-	'▎',
-	'▍',
-	'▌',
-	'▋',
-	'▊',
-	'▉',
-	'█',
+var chars = []string{
+	"▏",
+	"▎",
+	"▍",
+	"▌",
+	"▋",
+	"▊",
+	"▉",
+	"█",
 }
 
 type Bar struct {
 	buffer      bytes.Buffer
-	gauge       []rune
+	gauge       string
 	gaugeWidth  int
 	width       int
 	nowVal      int
 	totalVal    int
 	charLen     int
 	format      string
-	prefix      rune
-	postfix     rune
+	prefix      string
+	postfix     string
 	charge      string
 	ShowPercent bool
 	ShowCounter bool
@@ -55,9 +55,9 @@ func New(total int) *Bar {
 		nowVal:      -1,
 		charLen:     len(chars),
 		format:      "%s",
-		prefix:      '|',
-		postfix:     '|',
-		charge:      "⚡︎",
+		prefix:      "|",
+		postfix:     "|",
+		charge:      "ϟ",
 		ShowPercent: true,
 		ShowCounter: true,
 		Showthunder: false,
@@ -68,12 +68,12 @@ func New(total int) *Bar {
 }
 
 func (bar *Bar) SetPrefix(char rune) *Bar {
-	bar.prefix = char
+	bar.prefix = string(char)
 	return bar
 }
 
 func (bar *Bar) SetPostfix(char rune) *Bar {
-	bar.postfix = char
+	bar.postfix = string(char)
 	return bar
 }
 
@@ -81,8 +81,7 @@ func (bar *Bar) SetWidth(width int) *Bar {
 	bar.width = width
 	// +1 for postfix
 	bar.gaugeWidth = width + 1
-	// +1 for prefix
-	bar.gauge = make([]rune, bar.gaugeWidth+1, bar.gaugeWidth+1)
+
 	return bar
 }
 
@@ -105,9 +104,6 @@ func (bar *Bar) writer() {
 		bar.format += " %" + digit + "d/%" + digit + "d"
 	}
 
-	// for thunder
-	bar.format = "%s" + bar.format
-
 	if bar.nowVal <= bar.totalVal {
 		bar.print()
 	}
@@ -116,26 +112,46 @@ func (bar *Bar) writer() {
 
 func (bar *Bar) print() {
 	frac := float64(bar.nowVal) / float64(bar.totalVal)
+
+	if bar.Showthunder {
+		// append prefix
+		bar.gauge += bar.prefix
+		mid := int(math.Ceil(float64(bar.gaugeWidth / 2)))
+		for i := 1; i < mid; i++ {
+			bar.gauge += " "
+		}
+		// Middle
+		bar.gauge += bar.charge
+		for i := mid + 1; i < bar.gaugeWidth; i++ {
+			bar.gauge += " "
+		}
+		// append postfix
+		bar.gauge += bar.postfix
+		bar.write(frac)
+
+		return
+	}
+
 	barLen, fracBarLen := bar.divmod(frac)
 
 	// append prefix
-	bar.gauge[0] = bar.prefix
+	bar.gauge += bar.prefix
 
 	// append full block
 	for i := 1; i < barLen; i++ {
-		bar.gauge[i] = chars[bar.charLen-1]
+		bar.gauge += chars[bar.charLen-1]
 	}
 
 	// append lower block
-	bar.gauge[barLen] = chars[fracBarLen]
+	bar.gauge += chars[fracBarLen]
 
 	// padding with whitespace
 	for i := barLen + 1; i < bar.gaugeWidth; i++ {
-		bar.gauge[i] = ' '
+		bar.gauge += " "
 	}
 
 	// append postfix
-	bar.gauge[bar.gaugeWidth] = bar.postfix
+	bar.gauge += bar.postfix
 
 	bar.write(frac)
 }
@@ -143,12 +159,6 @@ func (bar *Bar) print() {
 func (bar *Bar) write(frac float64) {
 	var args []interface{}
 	percent := int(frac * 100)
-
-	if bar.Showthunder {
-		args = append(args, bar.charge)
-	} else {
-		args = append(args, "  ")
-	}
 
 	if bar.ShowPercent {
 		args = append(args, percent)
