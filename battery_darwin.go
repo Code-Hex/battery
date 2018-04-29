@@ -14,7 +14,7 @@ void setStrValue(char **dest, const char *src) {
 	strncpy(*dest, src, len);
 }
 
-int battery(char **status, char **error) {
+void battery(int *percentage, int *elapsed, char **status, char **error) {
 
 	CFTypeRef powerInfo = IOPSCopyPowerSourcesInfo();
 	CFArrayRef powerSrcList = IOPSCopyPowerSourcesList(powerInfo);
@@ -23,29 +23,29 @@ int battery(char **status, char **error) {
 	if (!powerSrcList) {
 		if (powerInfo) CFRelease(powerInfo);
 		setStrValue(error, "Failed to get value from IOPSCopyPowerSourcesList()");
-		return -1;
+		return;
 	}
 
-	int percentage;
 	const void *powerSrcVal = NULL;
 	const char *powerStatus = NULL;
 	if (CFArrayGetCount(powerSrcList)) {
 		powerSrcInfo = IOPSGetPowerSourceDescription(powerInfo, CFArrayGetValueAtIndex(powerSrcList, 0));
 		powerSrcVal = CFDictionaryGetValue(powerSrcInfo, CFSTR(kIOPSCurrentCapacityKey));
-		CFNumberGetValue((CFNumberRef)powerSrcVal, kCFNumberIntType, &percentage);
+		CFNumberGetValue((CFNumberRef)powerSrcVal, kCFNumberIntType, percentage);
+
+		powerSrcVal = CFDictionaryGetValue(powerSrcInfo, CFSTR(kIOPSTimeToEmptyKey));
+		CFNumberGetValue((CFNumberRef)powerSrcVal, kCFNumberIntType, elapsed);
 
 		powerSrcVal = CFDictionaryGetValue(powerSrcInfo, CFSTR(kIOPSPowerSourceStateKey));
 		powerStatus = CFStringGetCStringPtr((CFStringRef)powerSrcVal, kCFStringEncodingUTF8);
 		setStrValue(status, powerStatus);
 	} else {
 		setStrValue(error, "Could not get power resource infomation");
-		return -1;
+		return;
 	}
 
     if (powerInfo) CFRelease(powerInfo);
     if (powerSrcList) CFRelease(powerSrcList);
-
-    return percentage;
 }
 */
 import "C"
@@ -54,16 +54,20 @@ import (
 	"unsafe"
 )
 
-func Info() (int, bool, error) {
+func Info() (int, int, bool, error) {
+	var percent C.int
+	var elapsed C.int
 	var status *C.char
 	var err *C.char
 	defer C.free(unsafe.Pointer(status))
 	defer C.free(unsafe.Pointer(err))
 
-	percent := int(C.battery(&status, &err))
-	if percent == -1 {
-		return percent, false, errors.New(C.GoString(err))
+	C.battery(&percent, &elapsed, &status, &err)
+	p := int(percent)
+	e := int(elapsed)
+	if p == -1 {
+		return p, e, false, errors.New(C.GoString(err))
 	}
 
-	return percent, "AC Power" == C.GoString(status), nil
+	return p, e, "AC Power" == C.GoString(status), nil
 }
