@@ -32,7 +32,7 @@ func Info() (int, int, bool, error) {
 		case "POWER_SUPPLY_CHARGE_NOW":
 			now, _ = strconv.ParseFloat(tokens[1], 64)
 		case "POWER_SUPPLY_STATUS":
-			present = tokens[1] == "Full"
+			present = tokens[1] == "Charging"
 		case "POWER_SUPPLY_POWER_NOW":
 			powerNow, _ = strconv.ParseFloat(tokens[1], 64)
 		}
