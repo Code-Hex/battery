@@ -3,20 +3,34 @@ package battery
 import (
 	"bufio"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
 
-func Info() (int, int, bool, error) {
-	f, err := os.Open("/sys/class/power_supply/BAT0/uevent")
+func Info() (percent int, elapsed int, present bool, err error) {
+	var uevents []string
+	uevents, err = filepath.Glob("/sys/class/power_supply/BAT*/uevent")
 	if err != nil {
-		return 0, 0, false, err
+		return
+	}
+	if len(uevents) == 0 {
+		return
+	}
+	var f *os.File
+	for _, u := range uevents {
+		f, err = os.Open(u)
+		if err == nil {
+			break
+		}
+	}
+	if err != nil {
+		return
 	}
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 
 	var full, now, powerNow float64
-	var present bool
 	for scanner.Scan() {
 		tokens := strings.SplitN(scanner.Text(), "=", 2)
 		if len(tokens) != 2 {
@@ -37,12 +51,11 @@ func Info() (int, int, bool, error) {
 			powerNow, _ = strconv.ParseFloat(tokens[1], 64)
 		}
 	}
-	var percent, elapsed int
 	if full > 0 {
 		percent = int(now / full * 100)
 	}
 	if powerNow > 0 {
 		elapsed = int(now / powerNow * 60)
 	}
-	return percent, elapsed, present, nil
+	return
 }
