@@ -12,6 +12,8 @@ Very Thanks [delphinus](https://github.com/delphinus)!!
 
 Let's run `battery -e`
 
+![elapsed time](https://user-images.githubusercontent.com/1239245/39427036-388223ce-4cbd-11e8-859a-5363cdac3452.png)
+
 (2016-10-24)  
 linux supported.  
 Thanks [mattn](https://github.com/mattn)!!  
