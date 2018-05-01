@@ -10,6 +10,8 @@ battery unicode art on your tmux sessions or the terminal.
 Supported to show elapsed time.  
 Very Thanks [delphinus](https://github.com/delphinus)!!
 
+Let's run `battery -e`
+
 (2016-10-24)  
 linux supported.  
 Thanks [mattn](https://github.com/mattn)!!  
