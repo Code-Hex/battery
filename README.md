@@ -6,6 +6,10 @@ battery - Draw battery unicode art written by Go
 battery unicode art on your tmux sessions or the terminal.  
 
 ## Status
+(2018-05-01)  
+Supported to show elapsed time.  
+Very Thanks [delphinus](https://github.com/delphinus)!!
+
 (2016-10-24)  
 linux supported.  
 Thanks [mattn](https://github.com/mattn)!!  
@@ -28,7 +32,7 @@ Please refer to [this](https://github.com/Code-Hex/dotfiles/blob/master/tmux/.tm
 ## Contributor 🎊
 [mattn](https://github.com/mattn)  
 [yasu47b](https://github.com/yasu47b)  
-[b4b4r07](https://github.com/b4b4r07)
+[b4b4r07](https://github.com/b4b4r07)  
 [delphinus](https://github.com/delphinus)
 
 ## Author
