@@ -29,6 +29,7 @@ Please refer to [this](https://github.com/Code-Hex/dotfiles/blob/master/tmux/.tm
 [mattn](https://github.com/mattn)  
 [yasu47b](https://github.com/yasu47b)  
 [b4b4r07](https://github.com/b4b4r07)
+[delphinus](https://github.com/delphinus)
 
 ## Author
 [codehex](https://twitter.com/CodeHex)
