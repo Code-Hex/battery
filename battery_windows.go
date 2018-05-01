@@ -1,6 +1,7 @@
 package battery
 
 import (
+	"math"
 	"syscall"
 	"unsafe"
 )
@@ -19,13 +20,19 @@ type SYSTEM_POWER_STATUS struct {
 	BatteryFullLifeTime uint32
 }
 
-func Info() (int, bool, error) {
+func Info() (int, int, bool, error) {
 	var sps SYSTEM_POWER_STATUS
 	_, r1, err := procGetSystemPowerStatus.Call(uintptr(unsafe.Pointer(&sps)))
 	if r1 != 0 {
 		if err != nil {
-			return 0, false, err
+			return 0, 0, false, err
 		}
 	}
-	return int(sps.BatteryLifePercent), sps.ACLineStatus == 1, nil
+	percent := int(sps.BatteryLifePercent)
+	var elapsed int
+	// BatteryLifeTime has MaxUint32 (2^32-1) when it cannot be detected.
+	if sps.BatteryLifeTime != math.MaxUint32 {
+		elapsed = int(float64(sps.BatteryLifeTime) / 60)
+	}
+	return percent, elapsed, sps.ACLineStatus == 1, nil
 }

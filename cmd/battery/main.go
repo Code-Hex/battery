@@ -20,13 +20,14 @@ type Options struct {
 	Help    bool `short:"h" long:"help"`
 	Tmux    bool `short:"t" long:"tmux"`
 	Has     bool `long:"has"`
+	Elapsed bool `short:"e" long:"elapsed"`
 	Version bool `short:"v" long:"version"`
 }
 
 func main() {
 	var opts Options
 	parseOptions(&opts, os.Args[1:])
-	percent, state, err := battery.Info()
+	percent, elapsed, state, err := battery.Info()
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -37,12 +38,13 @@ func main() {
 	bar.ShowCounter = false
 	bar.EnableColor = true
 	bar.Showthunder = state
+	bar.ShowElapsed = opts.Elapsed
 
-	bar.Set(percent).Run()
+	bar.Set(percent, elapsed).Run()
 }
 
 func hasBattery() int {
-	if _, _, err := battery.Info(); err != nil {
+	if _, _, _, err := battery.Info(); err != nil {
 		return 1
 	}
 	return 0
@@ -92,6 +94,7 @@ func (opts Options) usage() []byte {
   -h,  --help        print usage and exit
   -v,  --version     display the version of battery and exit
   -t,  --tmux        display battery ascii art on tmux
+  -e,  --elapsed     display the elapsed time to charge / discharge
        --has         check to see if your device have the battery
 `)
 	return buf.Bytes()

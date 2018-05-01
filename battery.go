@@ -28,6 +28,7 @@ type Bar struct {
 	gaugeWidth  int
 	width       int
 	nowVal      int
+	elapsed     int
 	totalVal    int
 	charLen     int
 	format      string
@@ -37,6 +38,7 @@ type Bar struct {
 	ShowPercent bool
 	ShowCounter bool
 	Showthunder bool
+	ShowElapsed bool
 	EnableColor bool
 	EnableTmux  bool
 }
@@ -61,6 +63,7 @@ func New(total int) *Bar {
 		ShowPercent: true,
 		ShowCounter: true,
 		Showthunder: false,
+		ShowElapsed: false,
 		EnableColor: false,
 		EnableTmux:  true,
 	}
@@ -85,8 +88,9 @@ func (bar *Bar) SetWidth(width int) *Bar {
 	return bar
 }
 
-func (bar *Bar) Set(set int) *Bar {
-	bar.nowVal = set
+func (bar *Bar) Set(percent, elapsed int) *Bar {
+	bar.nowVal = percent
+	bar.elapsed = elapsed
 	return bar
 }
 
@@ -102,6 +106,10 @@ func (bar *Bar) writer() {
 	if bar.ShowCounter {
 		digit := digit(bar.totalVal)
 		bar.format += " %" + digit + "d/%" + digit + "d"
+	}
+
+	if bar.ShowElapsed {
+		bar.format += "%s"
 	}
 
 	if bar.nowVal <= bar.totalVal {
@@ -169,6 +177,14 @@ func (bar *Bar) write(frac float64) {
 	if bar.ShowCounter {
 		args = append(args, bar.nowVal)
 		args = append(args, bar.totalVal)
+	}
+
+	if bar.ShowElapsed {
+		if bar.elapsed > 0 {
+			args = append(args, fmt.Sprintf(" %d:%02d", bar.elapsed/60, bar.elapsed%60))
+		} else {
+			args = append(args, "")
+		}
 	}
 
 	if bar.EnableColor {
