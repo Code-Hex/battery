@@ -21,6 +21,7 @@ type Options struct {
 	Tmux    bool `short:"t" long:"tmux"`
 	Has     bool `long:"has"`
 	Elapsed bool `short:"e" long:"elapsed"`
+	Icon    bool `short:"i" long:"icon"`
 	Version bool `short:"v" long:"version"`
 }
 
@@ -39,6 +40,7 @@ func main() {
 	bar.EnableColor = true
 	bar.Showthunder = state
 	bar.ShowElapsed = opts.Elapsed
+	bar.ShowIcon = opts.Icon
 
 	bar.Set(percent, elapsed).Run()
 }
@@ -95,6 +97,7 @@ func (opts Options) usage() []byte {
   -v,  --version     display the version of battery and exit
   -t,  --tmux        display battery ascii art on tmux
   -e,  --elapsed     display the elapsed time to charge / discharge
+  -i,  --icon        display battery with icon
        --has         check to see if your device have the battery
 `)
 	return buf.Bytes()
