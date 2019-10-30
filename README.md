@@ -29,6 +29,33 @@ So, plz help me (´；ω；｀)
 ## Installation
     go get -u github.com/Code-Hex/battery/cmd/battery
 
+## Support patched fonts
+You can display the status of battery with patched fonts.
+Installing the font, Inconsolata Nerd Font Complete.otf for example, you can do it like below.
+
+* For mac
+```
+cd ~/Library/Fonts/
+wget https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Inconsolata/complete/Inconsolata%20Nerd%20Font%20Complete.otf
+```
+
+* For Linux
+```
+cd ~/.local/share/fonts
+wget https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Inconsolata/complete/Inconsolata%20Nerd%20Font%20Complete.otf
+```
+
+* For Windows
+```
+* Open your browser then fill this url
+  https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/Inconsolata/complete/Inconsolata%20Nerd%20Font%20Complete.otf
+* Double click the file that you downloaded and the window will be opened
+* Click the install button
+```
+
+Your environment might require to reboot the OS. If so, reboot your OS.
+Then open your terminal and set your preferences to use it.
+
 ## Usage
 For tmux user, please write `#(battery -t)` in your `.tmux.conf`  
 Please refer to [this](https://github.com/Code-Hex/dotfiles/blob/master/tmux/.tmux.conf#L82)
