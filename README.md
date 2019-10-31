@@ -36,13 +36,13 @@ Installing the font, Inconsolata Nerd Font Complete.otf for example, you can do 
 * For mac
 ```
 cd ~/Library/Fonts/
-wget https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Inconsolata/complete/Inconsolata%20Nerd%20Font%20Complete.otf
+wget https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/Inconsolata/complete/Inconsolata%20Nerd%20Font%20Complete.otf
 ```
 
 * For Linux
 ```
 cd ~/.local/share/fonts
-wget https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Inconsolata/complete/Inconsolata%20Nerd%20Font%20Complete.otf
+wget https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/Inconsolata/complete/Inconsolata%20Nerd%20Font%20Complete.otf
 ```
 
 * For Windows
