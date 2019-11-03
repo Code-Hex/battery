@@ -6,6 +6,12 @@ battery - Draw battery unicode art written by Go
 battery unicode art on your tmux sessions or the terminal.  
 
 ## Status
+(2019-11-03)  
+Supported to display patched fonts  
+Very Thanks [TsutomuNakamura](https://github.com/TsutomuNakamura)!!
+
+Let's run `battery -i` after installed patched fonts. [See more details](https://github.com/Code-Hex/battery#support-patched-fonts). 
+
 (2018-05-01)  
 Supported to show elapsed time.  
 Very Thanks [delphinus](https://github.com/delphinus)!!
@@ -71,6 +77,7 @@ Then for tmux user, please write `#(battery -t -i)` in your `.tmux.conf`.
 [yasu47b](https://github.com/yasu47b)  
 [b4b4r07](https://github.com/b4b4r07)  
 [delphinus](https://github.com/delphinus)
+[TsutomuNakamura](https://github.com/TsutomuNakamura)
 
 ## Author
 [codehex](https://twitter.com/CodeHex)
