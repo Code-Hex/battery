@@ -22,6 +22,16 @@ var chars = []string{
 	"█",
 }
 
+// Icons of battery
+var icons = []string{
+	"   ",
+	"   ",
+	"   ",
+	"   ",
+	"   ",
+	"   ",
+}
+
 type Bar struct {
 	buffer      bytes.Buffer
 	gauge       string
@@ -39,6 +49,7 @@ type Bar struct {
 	ShowCounter bool
 	Showthunder bool
 	ShowElapsed bool
+	ShowIcon    bool
 	EnableColor bool
 	EnableTmux  bool
 }
@@ -64,6 +75,7 @@ func New(total int) *Bar {
 		ShowCounter: true,
 		Showthunder: false,
 		ShowElapsed: false,
+		ShowIcon:    false,
 		EnableColor: false,
 		EnableTmux:  true,
 	}
@@ -140,26 +152,30 @@ func (bar *Bar) print() {
 		return
 	}
 
-	barLen, fracBarLen := bar.divmod(frac)
+	if bar.ShowIcon {
+		// append an icon
+		bar.gauge += icons[bar.nowVal / 20]
+	} else {
+		barLen, fracBarLen := bar.divmod(frac)
 
-	// append prefix
-	bar.gauge += bar.prefix
+		// append prefix
+		bar.gauge += bar.prefix
 
-	// append full block
-	for i := 1; i < barLen; i++ {
-		bar.gauge += chars[bar.charLen-1]
+		// append full block
+		for i := 1; i < barLen; i++ {
+			bar.gauge += chars[bar.charLen-1]
+		}
+
+		// append lower block
+		bar.gauge += chars[fracBarLen]
+
+		// padding with whitespace
+		for i := barLen + 1; i < bar.gaugeWidth; i++ {
+			bar.gauge += " "
+		}
+		// append postfix
+		bar.gauge += bar.postfix
 	}
-
-	// append lower block
-	bar.gauge += chars[fracBarLen]
-
-	// padding with whitespace
-	for i := barLen + 1; i < bar.gaugeWidth; i++ {
-		bar.gauge += " "
-	}
-
-	// append postfix
-	bar.gauge += bar.postfix
 
 	bar.write(frac)
 }
