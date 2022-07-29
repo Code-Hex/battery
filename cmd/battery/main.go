@@ -10,10 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	version = "0.2.0"
-	msg     = "battery v" + version + "\n"
-)
+var version string
 
 // Options struct for parse command line arguments
 type Options struct {
@@ -65,7 +62,10 @@ func parseOptions(opts *Options, argv []string) {
 	}
 
 	if opts.Version {
-		fmt.Fprintf(os.Stdout, msg)
+		if version == "" {
+			version = "build from source"
+		}
+		fmt.Fprintf(os.Stdout, "battery version: %q\n", version)
 		os.Exit(0)
 	}
 
@@ -89,8 +89,11 @@ func (opts *Options) parse(argv []string) ([]string, error) {
 
 func (opts Options) usage() []byte {
 	buf := bytes.Buffer{}
+	if version == "" {
+		version = "build from source"
+	}
 
-	fmt.Fprintf(&buf, msg+
+	fmt.Fprintf(&buf, "battery version: %q\n"+
 		`Usage: battery [options]
   Options:
   -h,  --help        print usage and exit
@@ -99,6 +102,6 @@ func (opts Options) usage() []byte {
   -e,  --elapsed     display the elapsed time to charge / discharge
   -i,  --icon        display battery with icon
        --has         check to see if your device have the battery
-`)
+`, version)
 	return buf.Bytes()
 }
