@@ -6,6 +6,10 @@ battery - Draw battery unicode art written by Go
 battery unicode art on your tmux sessions or the terminal.  
 
 ## Status
+(2022-07-29)  
+macOS build artifacts are **cgo-less** now!!  
+use gorelease to release artifacts.
+
 (2019-11-03)  
 Supported to display patched fonts.  
 Very Thanks [TsutomuNakamura](https://github.com/TsutomuNakamura)!!
@@ -33,7 +37,23 @@ However, I hope to support ~~windows~~ and ~~linux~~, bsd in future.
 So, plz help me (´；ω；｀)  
 
 ## Installation
-    go get -u github.com/Code-Hex/battery/cmd/battery
+
+### Mac and Linux users via Homebrew
+
+```
+$ brew update
+$ brew install Code-Hex/tap/battery
+```
+
+### Go
+
+```
+$ go install github.com/Code-Hex/battery/cmd/battery@latest
+```
+
+### Binary
+
+You can download from [here](https://github.com/Code-Hex/battery/releases)
 
 ## Usage
 For tmux user, please write `#(battery -t)` in your `.tmux.conf`  
