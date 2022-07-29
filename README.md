@@ -8,7 +8,7 @@ battery unicode art on your tmux sessions or the terminal.
 ## Status
 (2022-07-29)  
 macOS build artifacts are **cgo-less** now!!  
-use gorelease to release artifacts.
+use goreleaser to release artifacts.
 
 (2019-11-03)  
 Supported to display patched fonts.  
